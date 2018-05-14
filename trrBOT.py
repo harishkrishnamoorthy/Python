@@ -12,8 +12,6 @@ import dash_table_experiments as dt
 
 import pandas as pd
 
-
-import pandas as pd
 import numpy as np
 import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -32,7 +30,6 @@ custom_sent_tokenizer = PunktSentenceTokenizer(train_text)
 
 # creating a function that will retrive only base verb forms
 is_verb = lambda pos: pos == 'VB'
-
 
 #Single 'should' - past tense
 def transform_stmt_single_shd_past(stmt):
@@ -86,7 +83,6 @@ def transform_stmt_single_shd_past(stmt):
 
     else:
         return stmt
-
 
 #Single 'should' - present tense
 def transform_stmt_single_shd_present(stmt):
@@ -149,7 +145,6 @@ def transform_stmt_single_shd_present(stmt):
     else:
         return stmt
 
-
 #multiple 'should' - present
 def transform_stmt_mul_shd_present(stmt):
     temp_pst_collate = ""
@@ -159,8 +154,6 @@ def transform_stmt_mul_shd_present(stmt):
         #print(temp_pst_collate)
     return temp_pst_collate[3:]
 
-
-
 #multiple 'should' - past
 def transform_stmt_mul_shd_past(stmt):
     temp_pst_collate = ""
@@ -169,8 +162,6 @@ def transform_stmt_mul_shd_past(stmt):
         temp_pst_collate = temp_pst_collate + 'and' + transform_stmt_single_shd_past(stmt)
         #print(temp_pst_collate)
     return temp_pst_collate[3:]
-
-
 
 #process Expected result - convert to present tense
 def processExpRes_present(df):
@@ -198,8 +189,6 @@ def processExpRes_present(df):
     se = pd.Series(all_prsnt_stmt)
     df['Conv_exptd_prsnt'] = se.values
 
-
-
 #process Expected result - convert to past tense
 def processExpRes_past(df):
     #verb_lst = []
@@ -226,8 +215,6 @@ def processExpRes_past(df):
     se = pd.Series(all_past_stmt)
     df['Conv_exptd_past'] = se.values
 
-
-
 #process actual result - trim User Info
 def processActRes(df):
     trm_act_res = []
@@ -240,7 +227,6 @@ def processActRes(df):
             print(str(e))
     ac = pd.Series(trm_act_res)
     df['Converted_Actual'] = ac.values
-
 
 def generatecompResult(df):
     cmpexpactlst = []
@@ -284,7 +270,6 @@ def generateStepList(df):
     df2 = pd.DataFrame({'TEST_ID':ukeys, 'Steps to Verify':[list(a) for a in arrays]})
     return df2
 
-
 def generateSummary(df):
     cnts = pd.DataFrame(df.TEST_ID.value_counts().reset_index())
     cnts.columns = ["TEST_ID", "Total Steps"]
@@ -303,10 +288,11 @@ def generateSummary(df):
     return final_sum_df
 
 
-
+#generate web page components
 app = dash.Dash()
 
 app.scripts.config.serve_locally = True
+#bootstrap class
 app.css.append_css({'external_url': 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css'})
 app.layout = html.Div([
     html.Div(
@@ -315,29 +301,29 @@ app.layout = html.Div([
             #html.A(['Home'], href = '#', className="nav-link mr-auto text-white"),
             #html.A(['Help'], href = '#', className="nav-link text-white")
             dcc.Location(id='url', refresh=False),
-            #html.Button('Help', className="btn btn-link"),
-            html.A(html.Button('Help', className='btn btn-link'),
-            href='https://getbootstrap.com/')
+            html.Button('Help', className="btn btn-info btn-sm")
+            #WIP ------------------------------------------------------------------
+            #html.A(html.Button('Help', className='btn btn-link'),
+            #href='https://getbootstrap.com/')
         ], className="navbar navbar-dark bg-dark")
     ),
     html.Div(id='page-content'),
     html.Br(),
     html.Br(),
-    html.Br(),
+    #html.Br(),
     html.Div([
         html.Div([
-            html.H1("Test Results Review"),
+            html.H1("Test Results Review", className="display-4"),
             html.P("Upload excel or CSV file(s) to get started ..", className="lead"),
                 dcc.Upload(
                     id='upload-data',
-                    children=html.Div([
-                        '',
+                    children=html.Div(['',
                         html.Button("Upload", id='upload-data', className="btn btn-dark")
                     ]),
                     # Allow multiple files to be uploaded
                     multiple=True
                 )
-        ], className="starter-template")
+        ], className="jumbotron jumbotron-fluid")
     ], className ="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column text-center"),
     html.Div(id='output-data-upload'),
     html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'})
@@ -374,7 +360,6 @@ def parse_contents(contents, filename, date):
             summaryStats_df.to_excel(writer, sheet_name = 'Summary', engine='xlsxwriter', encoding='utf-8', index=False)
             df.to_excel(writer, sheet_name = 'Data', engine='xlsxwriter', encoding='utf-8', index=False)
             writer.save()
-
 
     except Exception as e:
         print(e)
