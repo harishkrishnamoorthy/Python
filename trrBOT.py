@@ -368,8 +368,8 @@ def parse_contents(contents, filename, date):
         time = datetime.datetime.now().strftime("%m_%d_%Y_%H%M%S")
 
         #writing results file
-        new_filename = 'Results saved at:  C:\\Result_{}.xlsx'.format(time)
         old_filename = filename[:filename.find('.')]
+        new_filename = 'Results saved at: C:\\Results\\{}_Result_{}.xlsx'.format(old_filename, time)
         with pd.ExcelWriter ('C:\\Results./{}_Result_{}.xlsx'.format(old_filename, time)) as writer:
             summaryStats_df.to_excel(writer, sheet_name = 'Summary', engine='xlsxwriter', encoding='utf-8', index=False)
             df.to_excel(writer, sheet_name = 'Data', engine='xlsxwriter', encoding='utf-8', index=False)
