@@ -372,7 +372,7 @@ def parse_contents(contents, filename, date):
     return html.Div([
         html.Details([
             html.Summary("Results for " + filename),
-            html.H6(new_filename),
+            html.H6 (new_filename),
             html.Div([
                 html.Div([
                     html.Div([
@@ -437,7 +437,7 @@ def parse_contents(contents, filename, date):
                                     showlegend=False
                                 )
                             }
-                        ),
+                        )
                     ], className="col-6")
                 ], className="row")
             ]),
@@ -446,7 +446,7 @@ def parse_contents(contents, filename, date):
                 rows=summaryStats_df.to_dict('records'),
                 columns = (["TEST_ID", "Action", "Total Steps", "Approved", "Verify", "Steps to Verify"]),
                 filterable=True, editable=False),
-            #html.Hr(),      # horizontal line
+            html.Hr(),      # horizontal line
         ])
     ])
 

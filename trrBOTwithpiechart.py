@@ -9,7 +9,6 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table_experiments as dt
-import plotly.graph_objs as go
 
 import pandas as pd
 
@@ -294,7 +293,6 @@ app = dash.Dash()
 app.scripts.config.serve_locally = True
 #bootstrap class
 app.css.append_css({'external_url': 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css'})
-
 app.layout = html.Div([
     html.Div(
         html.Nav([
@@ -309,7 +307,7 @@ app.layout = html.Div([
         ], className="navbar navbar-dark bg-dark")
     ),
     html.Div(id='page-content'),
-    #html.Br(),
+    html.Br(),
     html.Br(),
     #html.Br(),
     html.Div([
@@ -353,6 +351,7 @@ def parse_contents(contents, filename, date):
         generatecompResult(df)
         summaryStats_df= generateSummary(df)
         time = datetime.datetime.now().strftime("%m_%d_%Y_%H%M%S")
+
         verify_count =  summaryStats_df[(summaryStats_df['Action'] == "Verify")]['TEST_ID'].count()
         approve_count = summaryStats_df[(summaryStats_df['Action'] == "Approve")]['TEST_ID'].count()
         #writing results file
@@ -372,81 +371,43 @@ def parse_contents(contents, filename, date):
     return html.Div([
         html.Details([
             html.Summary("Results for " + filename),
-            html.H6(new_filename),
-            html.Div([
-                html.Div([
-                    html.Div([
-                        dcc.Graph(
-                            id=filename,
-                            figure={
-                                'data':[{
-                                    "pull": 0.05,
-                                    'labels':['Approve', 'Verify'],
-                                    'values': [int(approve_count), int(verify_count)],
-                                    "marker": {
-                                        "line": {
-                                          "width": 2
-                                        },
-                                        "colors": [
-                                          "rgb(23, 162, 184)",
-                                          "rgb(157, 170, 183)"
-                                        ]
-                                      },
-                                    'type': 'pie',}],
-                                "layout": {
-                                    "title":"Verify vs. Approved",
-                                    #"paper_bgcolor": "#F5F6F9",
-                                    #"plot_bgcolor": "#F5F6F9",
-                                    "legend": {
-                                        "x" : 0,
-                                        "y" : 1,
-                                        "bgcolor": "#F5F6F9",
-                                        "font": {
-                                            "color": "#4D5663"
-                                        }
-                                    }
-                                  }
-                            })
-                    ], className="col-6 border-right"),
-                    html.Div([
-                        dcc.Graph(
-                            id=new_filename,
-                            style={
-                                'height': 400
+            #html.H6("Processing started at: " + str(datetime.datetime.fromtimestamp(date))),
+            html.H6 (new_filename),
+            # Use the DataTable prototype component:
+            # github.com/plotly/dash-table-experiments
+            dcc.Graph(
+                id=filename,
+                figure={
+                    'data':[{
+                        "pull": 0.05,
+                        'labels':['Approve', 'Verify'],
+                        'values': [int(approve_count), int(verify_count)],
+                        "marker": {
+                            "line": {
+                              "width": 2
                             },
-                            figure={
-                                'data': [
-                                    go.Scatter(
-                                            x=summaryStats_df[summaryStats_df['TEST_ID'] == i]['Approved'],
-                                            y=summaryStats_df[summaryStats_df['TEST_ID'] == i]['Verify'],
-                                            text=summaryStats_df[summaryStats_df['TEST_ID'] == i]['TEST_ID'],
-                                            mode='markers',
-                                            opacity=0.7,
-                                            marker={
-                                                'size': 15,
-                                                'line': {'width': 0.5, 'color': 'white'}
-                                            },
-                                            name=i
-                                        ) for i in summaryStats_df.TEST_ID.unique()
-                                    ],
-                                'layout': go.Layout(
-                                    title='Verify vs. Approved',
-                                    xaxis={'type': 'log', 'title': 'Approve Count'},
-                                    yaxis={'title': 'Verify Count'},
-                                    hovermode='closest',
-                                    showlegend=False
-                                )
+                            "colors": [
+                              "rgb(23, 162, 184)",
+                              "rgb(157, 170, 183)"
+                            ]
+                          },
+                        'type': 'pie',}],
+                    "layout": {
+                        "paper_bgcolor": "#F5F6F9",
+                        "plot_bgcolor": "#F5F6F9",
+                        "legend": {
+                            "bgcolor": "#F5F6F9",
+                            "font": {
+                                "color": "#4D5663"
                             }
-                        ),
-                    ], className="col-6")
-                ], className="row")
-            ]),
-
+                        }
+                      }
+                }),
             dt.DataTable(
                 rows=summaryStats_df.to_dict('records'),
                 columns = (["TEST_ID", "Action", "Total Steps", "Approved", "Verify", "Steps to Verify"]),
                 filterable=True, editable=False),
-            #html.Hr(),      # horizontal line
+            html.Hr(),      # horizontal line
         ])
     ])
 
@@ -462,4 +423,4 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
         return children
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8051)
+    app.run_server(debug=True)
