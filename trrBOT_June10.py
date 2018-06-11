@@ -273,7 +273,6 @@ def verifyScreenshot(df):
     reason = ''
 
     for index, row in df.iterrows():
-        #print (row["St_desc"])
         if row["Compare_result"]=="Approved":
             if str(row["St_desc"]).lower().find("screenshot")>-1 and row["Screenshot"] != "Y":
                 #row["St_desc"].find("screenshot") >-1 and
@@ -347,6 +346,7 @@ app = dash.Dash()
 
 app.scripts.config.serve_locally = True
 #bootstrap class
+app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/brPBPO.css"})
 app.css.append_css({'external_url': 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css'})
 
 app.layout = html.Div([
